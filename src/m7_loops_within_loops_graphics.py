@@ -5,8 +5,8 @@ This problem provides practice at:
   ***  LOOPS WITHIN LOOPS in 2D GRAPHICS problems.  ***
 
 Authors: David Mutchler, Valerie Galluzzi, Mark Hays, Amanda Stouder,
-         their colleagues and PUT_YOUR_NAME_HERE.
-"""  # TODO: 1. PUT YOUR NAME IN THE ABOVE LINE.
+         their colleagues and Dutch Kipp.
+"""  # done: 1. PUT YOUR NAME IN THE ABOVE LINE.
 
 ########################################################################
 # Students:
@@ -29,6 +29,7 @@ Authors: David Mutchler, Valerie Galluzzi, Mark Hays, Amanda Stouder,
 ########################################################################
 
 import rosegraphics as rg
+import math
 
 
 def main():
@@ -89,7 +90,7 @@ def hourglass(window, n, point, radius, color):
     a color that rosegraphics understands.
     """
     # ------------------------------------------------------------------
-    # TODO: 2. Implement and test this function.
+    # done: 2. Implement and test this function.
     #       We provided some tests for you (above).
     # ------------------------------------------------------------------
     ####################################################################
@@ -101,6 +102,40 @@ def hourglass(window, n, point, radius, color):
     #    DIFFICULTY:      8
     #    TIME ESTIMATE:  25 minutes (warning: this problem is challenging)
     # ------------------------------------------------------------------
+
+    center_circle = rg.Circle(point, radius)
+    color_window(center_circle, color, window)
+
+    h = radius * math.sqrt(3)
+
+    for k in range(1, n):
+        start_circle = center_circle.clone()
+        start_circle.move_by(-radius*k, -h*k)
+        color_window(start_circle, color, window)
+        for j in range(k):
+            next_circle = start_circle.clone()
+            next_circle.move_by(2*radius*(j+1), 0)
+            color_window(next_circle, color, window)
+        start_circle = center_circle.clone()
+        start_circle.move_by(-radius * k, h * k)
+        color_window(start_circle, color, window)
+        for j in range(k):
+            next_circle = start_circle.clone()
+            next_circle.move_by(2 * radius * (j + 1), 0)
+            color_window(next_circle, color, window)
+
+
+def color_window(circle, color, window):
+    circle.fill_color = color
+    circle.attach_to(window)
+    window.render(0.01)
+
+    c = circle.center
+    left = rg.Point(c.x-circle.radius, c.y)
+    right = rg.Point(c.x+circle.radius, c.y)
+    line = rg.Line(left, right)
+    line.attach_to(window)
+    window.render()
 
 
 def run_test_many_hourglasses():
@@ -163,7 +198,7 @@ def many_hourglasses(window, square, m, colors):
     each of which denotes a color that rosegraphics understands.
     """
     # ------------------------------------------------------------------
-    # TODO: 3. Implement and test this function.
+    # done: 3. Implement and test this function.
     #       We provided some tests for you (above).
     # ------------------------------------------------------------------
     ####################################################################
@@ -179,6 +214,31 @@ def many_hourglasses(window, square, m, colors):
     #                         a correct "hourglass" function above)
     #    TIME ESTIMATE:  20 minutes (warning: this problem is challenging)
     # ------------------------------------------------------------------
+
+    radius = square.length_of_each_side/2
+    new_center = rg.Point(square.center.x, square.center.y)
+    square.attach_to(window)
+    window.render()
+
+    up_left = rg.Point(square.center.x-radius, square.center.y-radius)
+    bottom_right = rg.Point(square.center.x+radius, square.center.y+radius)
+
+    h = radius*math.sqrt(3)
+
+    count = 0
+    for k in range(1, m+1):
+        if count == len(colors):
+            count = 0
+        color = colors[count]
+        count = count + 1
+        hourglass(window, k, new_center, radius, color)
+        new_center.move_by(radius+2*k*radius, 0)
+        if k != m:
+            up_left.move_by((2*k)*radius, -h)
+            bottom_right.move_by((2*(k+1))*radius, h)
+            rectangle = rg.Rectangle(up_left, bottom_right)
+            rectangle.attach_to(window)
+            window.render()
 
 
 # ----------------------------------------------------------------------
